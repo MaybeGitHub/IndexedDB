@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <script src="IndexedDBShim.min.js"></script>
+    <script src="jquery-2.1.3.min.js"></script>
+    <script src="jquery.indexeddb.js"></script>
+</head>
+<body>    
+    LOGIN: <input type="text" id="login" />
+    PASSWORD: <input type="password" id="password" />
+    <input type="submit" value="LOG IN" id="boton"/>
+    
+    <script>
+        var usuarios = [{ "login": "pepe", "password": "pepepe" }, { "login": "meme", "password": "mema" }];
+        $.indexedDB("BBDD", {
+            "schema":  {
+                    "1": function (db) {
+                        db.createObjectStore("Usuarios", { "keyPath": "login" });                        
+                    }
+                }
+        }).done(alert("BASE DE DATOS ABIERTA CORRECTAMENTE")).transaction("Usuarios").progress(function(t){
+            alert("Transaction in progress");
+            usuarios.forEach(function (el, pos, ar) {
+                t.objectStore("Usuarios").add(el).done(alert("Usuario " + el.login + " añadido correctamente."));
+            })        
+        });     
+
+        $("#boton").on("click", function () {
+            var login = $("#login").val();
+            var password = $("#password").val();
+            $.indexedDB("BBDD").transaction("Usuarios").progress(function(t){ 
+                t.objectStore("Usuarios").get(login).done(function(elem){
+                        alert("Login : " + elem.login);
+                        if (elem.password == password) {
+                            document.location.href = "Bienvenido.html";
+                        }
+                    })
+                })
+            })            
+    </script>
+</body>
+</html>
