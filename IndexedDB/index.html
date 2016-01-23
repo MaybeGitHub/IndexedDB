@@ -12,33 +12,36 @@
     PASSWORD: <input type="password" id="password" />
     <input type="submit" value="LOG IN" id="boton"/>
     
-    <script>
+    <script>        
         var usuarios = [{ "login": "pepe", "password": "pepepe" }, { "login": "meme", "password": "mema" }];
-        $.indexedDB("BBDD", {
-            "schema":  {
+        $.indexedDB("BBDD").deleteDatabase().progress(alert("Borrando la Base de datos")).done(function () {
+            alert("Base de Datos Borrada");
+            $.indexedDB("BBDD", {
+                "schema": {
                     "1": function (db) {
-                        db.createObjectStore("Usuarios", { "keyPath": "login" });                        
+                        db.createObjectStore("Usuarios", { "keyPath": "login" });
                     }
                 }
-        }).done(alert("BASE DE DATOS ABIERTA CORRECTAMENTE")).transaction("Usuarios").progress(function(t){
-            alert("Transaction in progress");
-            usuarios.forEach(function (el, pos, ar) {
-                t.objectStore("Usuarios").add(el).done(alert("Usuario " + el.login + " añadido correctamente."));
-            })        
-        });     
+            }).progress(alert("Creando base de Datos")).done(alert("Base de Datos creada")).transaction("Usuarios").progress(function (t) {
+                alert("Transaccion en progreso");
+                usuarios.forEach(function (el, pos, ar) {
+                    t.objectStore("Usuarios").add(el).done(alert("Usuario " + el.login + " añadido correctamente."));
+                })
+            });
 
-        $("#boton").on("click", function () {
-            var login = $("#login").val();
-            var password = $("#password").val();
-            $.indexedDB("BBDD").transaction("Usuarios").progress(function(t){ 
-                t.objectStore("Usuarios").get(login).done(function(elem){
+            $("#boton").on("click", function () {
+                var login = $("#login").val();
+                var password = $("#password").val();
+                $.indexedDB("BBDD").transaction("Usuarios").progress(function (t) {
+                    t.objectStore("Usuarios").get(login).done(function (elem) {
                         alert("Login : " + elem.login);
                         if (elem.password == password) {
                             document.location.href = "Bienvenido.html";
                         }
                     })
                 })
-            })            
+            })
+        });
     </script>
 </body>
 </html>
